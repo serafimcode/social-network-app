@@ -1,0 +1,33 @@
+services:
+  social-network-app:
+    build:
+      context: .
+      dockerfile: .docker/dev.Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - ./:/app/social-network-app:delegated
+      - ./.docker/entrypoints/dev.sh:/entrypoint.sh:ro
+    entrypoint: /entrypoint.sh
+    ports:
+      - 8080:8080
+    depends_on:
+      - pg
+
+  pg:
+    image: postgres:15.2-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: social-network-db
+      SERVICE_NAME: pg
+      POSTGRES_HOST_AUTH_METHOD: trust
+    expose:
+      - "5432"
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - data:/var/lib/postgresql
+
+volumes:
+  data:
